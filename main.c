@@ -72,9 +72,27 @@ void server(const char *port)
                 continue;
             }
 
+            Client c = { csock };
+            int exists = 0;
+            for (int i = 1; i <= connected; ++i) {
+                if (strncmp(c.name, clients[i].name, strlen(c.name)) == 0) {
+                    write_client(c.sock, "\n[Oops] username already exists.\n");
+                    print_connected_users(1, c.sock);
+                    clear_client(c);
+                    exists = 1;
+                    break;
+                }
+            }
+
+            if (exists > 0) {
+                continue;
+            } else {
+                write_client(c.sock, "\n[SUCCESS] You are successfully connected!\n[+] Start chatting others or just type :help to list all available commands.\n");
+            }
+
             max = csock > max ? csock : max;
             FD_SET(csock, &rdfs);
-            Client c = { csock };
+
             strncpy(c.name, buffer, BUF_SIZE - 1);
             connected++;
             printf("\r[+] %s Connected\n", c.name);
