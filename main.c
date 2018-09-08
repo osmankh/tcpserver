@@ -103,8 +103,9 @@ void server(const char *port)
                 if (strncmp(c.name, clients[i].name, strlen(c.name)) == 0) {
                     write_client(c.sock, "\n[Oops] username already exists.\n");
                     print_connected_users(1, c.sock);
-                    /// username already exists, so clear the connection
-                    clear_client(c);
+                    /// username already exists, so end the connection
+                    end_connection(c.sock);
+                    memmove(&c,&c + 1, 0);
                     exists = 1;
                     break;
                 }
